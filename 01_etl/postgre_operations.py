@@ -30,7 +30,7 @@ def get_data_to_postgre(pg_conn: _connection, query: str):
     """
     try:
         pg_cursor = postgre_cursor(pg_conn)
-        pg_cursor.execute('SELECT * FROM content.film_work;')
+        pg_cursor.execute(query)
         return pg_cursor
     except psycopg2.Error:
         logger.exception('Ошибка при получении данных из postgre')
