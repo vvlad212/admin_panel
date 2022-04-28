@@ -12,7 +12,6 @@ def create_body(model_row: dict):
             "_id": f"{model_row['id']}"
         }
     }
-
     return row, model_row
 
 

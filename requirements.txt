@@ -3,3 +3,4 @@ python-dotenv==0.20.0
 flake8-bandit==2.1.2
 psycopg2-binary==2.9.3
 elasticsearch==7.17.3
+pydantic~=1.9.0

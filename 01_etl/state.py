@@ -58,10 +58,10 @@ class State:
         else:
             return None
 
-# Press the green button in the gutter to run the script.
+
 if __name__ == '__main__':
-    storage = JsonFileStorage()
-    storage.file_path = '/Users/vladislavzujkov/PycharmProjects/Yandex_learn/test.json'
-    state = State(storage).get_state('modifie')
-    State(storage).set_state('1', 'sstate')
+    # storage = JsonFileStorage()
+    # storage.file_path = '/Users/vladislavzujkov/PycharmProjects/Yandex_learn/test.json'
+    # state = State(storage).get_state('modifie')
+    # State(storage).set_state('1', 'sstate')
     pass

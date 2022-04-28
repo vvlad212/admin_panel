@@ -7,24 +7,26 @@
 import uuid
 from dataclasses import dataclass, field
 import datetime
+from pydantic import BaseModel
 
-@dataclass
-class FilmWorkPersonGenre:
+
+class FilmWorkPersonGenre(BaseModel):
     """Класс описывающий структуру таблицы Film_work."""
 
-    #type: str
-    #created: str
-    #modified: datetime.timezone.utc
-    genre: dict
+    def __int__(self):
+
+        imdb_rating: 0.0
+        id: uuid.uuid4
+        writers_names : []
+
+    genre: list
     title: str
     description: str
-
-    actors_names: dict
-    writers_names: dict
+    director: list
+    actors_names: list
+    writers_names: list
     actors: list[dict]
     writers: list[dict]
 
-    director: list = field(default_factory=list.append)
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
-    imdb_rating: float = field(default=0.0)
-
+    id: uuid.UUID  # = field(default_factory=uuid.uuid4)
+    imdb_rating: float  # = field(default=0.0)
