@@ -6,12 +6,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 load_dotenv()
-dsl = {'dbname': os.environ.get('DB_NAME'),
-       'user': os.environ.get('DB_USER'),
-       'password': os.environ.get('DB_PASSWORD'),
-       'host': '127.0.0.1',
-       'port': 5432,
-       }
+dsl = {
+    'dbname': os.environ.get('DB_NAME'),
+    'user': os.environ.get('DB_USER'),
+    'password': os.environ.get('DB_PASSWORD'),
+    'host': os.environ.get('DB_HOST'),
+    'port': os.environ.get('DB_PORT'),
+}
 
 
 def postgre_cursor(connection: _connection):
