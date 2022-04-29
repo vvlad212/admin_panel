@@ -33,9 +33,11 @@ def to_es_from_postgre(pg_conn: _connection, page_size: int, es_client: client, 
             break
         bulk = []
 
-        modified = data[0]['modified']
-        [[bulk.append(r) for r in create_body(FilmWorkPersonGenre(**row).__dict__)] for row in data]
-
+        modified = str(data[0]['modified'])
+        try:
+            [[bulk.append(r) for r in create_body(FilmWorkPersonGenre(**row).__dict__)] for row in data]
+        except Exception as ex:
+            pass
         es_resp = upload_to_elastick(es_client, bulk)
         state = state.set_state('modified', modified)
         pass
@@ -46,8 +48,9 @@ if __name__ == '__main__':
     try:
         with psycopg2.connect(**dsl, cursor_factory=DictCursor) as pg_conn, elastick_connection(
                 os.environ.get('ES_URL')) as es_client:
-            state = state.State(state.BaseStorage)
-            state.file_path = '/Users/vladislavzujkov/PycharmProjects/Yandex_learn/test.json'
+            storage = state.JsonFileStorage()
+            state = state.State(storage)
+            state.file_path = '/Users/vladislavzujkov/YandexPracticum/new_admin_panel_sprint_3/01_etl/state.json'
             to_es_from_postgre(pg_conn, page_size, es_client, state)
 
 

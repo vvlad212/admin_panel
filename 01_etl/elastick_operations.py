@@ -5,7 +5,7 @@ from elasticsearch import client, Elasticsearch
 
 def create_body(model_row: dict):
     """Создание bulk строки для одного документа."""
-
+    #model_row.pop['modified']
     row = {
         "index": {
             "_index": "movies",

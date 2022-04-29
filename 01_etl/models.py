@@ -13,12 +13,6 @@ from pydantic import BaseModel
 class FilmWorkPersonGenre(BaseModel):
     """Класс описывающий структуру таблицы Film_work."""
 
-    def __int__(self):
-
-        imdb_rating: 0.0
-        id: uuid.uuid4
-        writers_names : []
-
     genre: list
     title: str
     description: str

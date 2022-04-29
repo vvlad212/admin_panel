@@ -17,7 +17,7 @@ class BaseStorage:
 
 class JsonFileStorage(BaseStorage):
     def __init__(self, file_path: Optional[str] = None):
-        self.file_path = file_path
+        self.file_path = '/Users/vladislavzujkov/YandexPracticum/new_admin_panel_sprint_3/01_etl/state.json'#file_path
 
     def retrieve_state(self) -> dict:
         """Загрузить состояние локально из постоянного хранилища."""
