@@ -1,11 +1,17 @@
-from contextlib import contextmanager
+import logging
 
 from elasticsearch import client, Elasticsearch
+from backoff import backoff
+from logging import config as logger_conf
+from log_config import log_conf
+
+logger_conf.dictConfig(log_conf)
+logger = logging.getLogger(__name__)
 
 
 def create_body(model_row: dict):
     """Создание bulk строки для одного документа."""
-    #model_row.pop['modified']
+
     row = {
         "index": {
             "_index": "movies",
@@ -15,10 +21,11 @@ def create_body(model_row: dict):
     return row, model_row
 
 
-def upload_to_elastick(es_client: client, bulk_list: list):
+@backoff()
+def upload_to_elastic(es_client: client, bulk_list: list):
     """Выполнение bulk запроса к elastick."""
 
-    if es_client.ping:
+    if es_client.ping():
         resp = es_client.bulk(body=bulk_list)
         return resp
     else:
@@ -26,9 +33,13 @@ def upload_to_elastick(es_client: client, bulk_list: list):
         pass
 
 
-@contextmanager
+@backoff()
 def elastick_connection(es_url: str):
     """Подключение к elastick"""
+
     client = Elasticsearch(es_url)
-    yield client
-    client.close()
+    if client.ping():
+        return client
+    else:
+        logger.error("Error ES connect")
+        raise ValueError("Error ES connect", es_url, client)

@@ -4,17 +4,28 @@ from psycopg2.extensions import connection as _connection
 import os
 import logging
 
+from psycopg2.extras import DictCursor
+from backoff import backoff
+
 logger = logging.getLogger(__name__)
 load_dotenv()
-dsl = {
-    'dbname': os.environ.get('DB_NAME'),
-    'user': os.environ.get('DB_USER'),
-    'password': os.environ.get('DB_PASSWORD'),
-    'host': os.environ.get('DB_HOST'),
-    'port': os.environ.get('DB_PORT'),
-}
 
 
+@backoff()
+def postgre_connection():
+    dsl = {
+        'dbname': os.environ.get('DB_NAME'),
+        'user': os.environ.get('DB_USER'),
+        'password': os.environ.get('DB_PASSWORD'),
+        'host': os.environ.get('DB_HOST'),
+        'port': os.environ.get('DB_PORT'),
+    }
+
+    with psycopg2.connect(**dsl, cursor_factory=DictCursor) as cursor:
+        return cursor
+
+
+@backoff()
 def postgre_cursor(connection: _connection):
     """Получение курсора для Postgres.
 
@@ -24,6 +35,7 @@ def postgre_cursor(connection: _connection):
     return connection.cursor()
 
 
+@backoff()
 def get_data_to_postgre(pg_conn: _connection, query: str):
     """Вставка данных в БД postgre.
 
