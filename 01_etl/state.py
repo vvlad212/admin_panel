@@ -1,9 +1,10 @@
 import abc
 import json
+import os
 from typing import Any, Optional
 
 
-class BaseStorage:
+class BaseStorage():
     def __init__(self):
         self.file_path = ''
 
@@ -22,12 +23,13 @@ class JsonFileStorage(BaseStorage):
 
     def retrieve_state(self) -> dict:
         """Загрузить состояние локально из постоянного хранилища."""
-        with open(self.file_path, 'r') as file:
-            state_file = file.read()
-            if state_file != '':
-                return json.loads(state_file)
-            else:
-                return {}
+        result = {}
+        if os.path.exists(self.file_path):
+            with open(self.file_path, 'r') as file:
+                state_file = file.read()
+                if state_file != '':
+                    result = json.loads(state_file)
+        return result
 
     def save_state(self, state: dict) -> None:
         """Сохранить состояние в постоянное хранилище"""
@@ -51,9 +53,5 @@ class State:
     def get_state(self, key: str) -> Any:
         """Получить состояние по определённому ключу"""
         state_dict = self.storage.retrieve_state()
-
+        # TODO проверить что вовзвращает пустой словарь
         return state_dict.get(key)
-        # if state_dict.keys().__contains__(key):
-        #     return state_dict[key]
-        # else:
-        #     return None

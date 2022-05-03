@@ -40,42 +40,45 @@ class ETL:
         self.page_size = query_page_size
         self.query_models = FilmWorkPersonGenre
 
+    def run(self):
+        data = self.extract_from_postgres()
+        for i in iter(data):
+            bulk, modified = self.transform_data(i)
+            self.load_to_elastic(bulk, modified)
+
     def extract_from_postgres(self):
         """Метод получения данных из Postgres."""
 
         if os.path.exists(self.state.storage.file_path):
             self.current_state = self.state.get_state('modified')
 
-        pg_cursor = self.ps.get_data_from_postgres(
-            self.pg_conn,
-            get_all_query(self.current_state)
-        )
-        self.transform_data(pg_cursor)
-
-    def transform_data(self, data_cursor):
-        """Подготовка данных для вставки в Elasctic."""
-
+        data_cursor = self.ps.get_data_from_postgres(self.pg_conn, get_all_query(self.current_state))
         while True:
             data = data_cursor.fetchmany(self.page_size)
             if not data:
                 logger.info("Data in elastic is updated")
                 break
+            yield data
 
-            modified = str(data[-1]['modified'])
+    def transform_data(self, data):
+        """Подготовка данных для вставки в Elasctic."""
 
-            bulk = []
-            for row in data:
-                model_row = self.query_models(**row).__dict__
-                bulk.append(
-                    {
-                        "index": {
-                            "_index": "movies",
-                            "_id": f"{model_row.pop('id')}"
-                        }
+        modified = str(data[-1]['modified'])
+        bulk = []
+
+        for row in data:
+            model_row = self.query_models(**row).__dict__
+            bulk.append(
+                {
+                    "index": {
+                        "_index": "movies",
+                        "_id": f"{model_row.pop('id')}"
                     }
-                )
-                bulk.append(model_row)
-            self.load_to_elastic(bulk, modified)
+                }
+            )
+            bulk.append(model_row)
+        return bulk, modified
+        # self.load_to_elastic(bulk, modified)
 
     def load_to_elastic(self, bulk: list, modified: str):
         """Загрузка подготовленных данных в Elastic."""
@@ -85,11 +88,10 @@ class ETL:
             self.state.set_state('modified', modified)
         else:
             logger.error('Write error in ES', es_resp)
-            self.state.set_state('modified', modified)
 
 
 if __name__ == '__main__':
-    page_size = 1000
+    page_size = 10
     state_file = os.environ.get('STATE_FILE')
     elastic_url = os.getenv('ES_URL')
     dsl = {
@@ -106,7 +108,7 @@ if __name__ == '__main__':
             elastic_connection_url=elastic_url,
             pg_dsl=dsl
         )
-        etl.extract_from_postgres()
+        etl.run()
 
     except psycopg2.OperationalError:
         logger.exception('Ошибка подключения к БД Postgres')
