@@ -1,10 +1,11 @@
 import abc
 import json
 import os
+from abc import ABC
 from typing import Any, Optional
 
 
-class BaseStorage():
+class BaseStorage(ABC):
     def __init__(self):
         self.file_path = ''
 
@@ -53,5 +54,4 @@ class State:
     def get_state(self, key: str) -> Any:
         """Получить состояние по определённому ключу"""
         state_dict = self.storage.retrieve_state()
-        # TODO проверить что вовзвращает пустой словарь
         return state_dict.get(key)
