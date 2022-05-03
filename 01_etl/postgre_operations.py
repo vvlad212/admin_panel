@@ -1,7 +1,6 @@
 import psycopg2
 from dotenv import load_dotenv
 from psycopg2.extensions import connection as _connection
-import os
 import logging
 
 from psycopg2.extras import DictCursor
@@ -11,19 +10,14 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 
-class Postgre_operations:
-    def __init__(self):
+class Postgres_operations:
+    """Класс, содержащий методы для работы с Postgres."""
 
-        self.dsl = {
-            'dbname': os.environ.get('DB_NAME'),
-            'user': os.environ.get('DB_USER'),
-            'password': os.environ.get('DB_PASSWORD'),
-            'host': os.environ.get('DB_HOST'),
-            'port': os.environ.get('DB_PORT'),
-        }
+    def __init__(self, dsl: [str, str]):
+        self.dsl = dsl
 
     @backoff()
-    def postgre_cursor(self, connection: _connection):
+    def postgres_cursor(self, connection: _connection):
         """Получение курсора для Postgres.
 
         Returns:
@@ -32,22 +26,26 @@ class Postgre_operations:
         return connection.cursor()
 
     @backoff()
-    def get_data_to_postgre(self, pg_conn: _connection, query: str):
-        """Вставка данных в БД postgre.
+    def get_data_from_postgres(self, pg_conn: _connection, query: str):
+        """Получение данных из БД Postgres.
 
-        Вставка осуществляется пачками, размер определяется параметром page_size
+        Returns:
+            connection.cursor:
         """
         try:
-            pg_cursor = self.postgre_cursor(pg_conn)
+            pg_cursor = self.postgres_cursor(pg_conn)
             pg_cursor.execute(query)
             return pg_cursor
         except psycopg2.Error:
-            logger.exception('Ошибка при получении данных из postgre')
-            return 'false'
-
+            logger.exception('Ошибка при получении данных из Postgres')
 
     @backoff()
-    def postgre_connection(self):
+    def postgres_connection(self):
+        """Подключение к БД Postgres.
+
+        Returns:
+            connection:
+        """
         with psycopg2.connect(**self.dsl,
-                              cursor_factory=DictCursor) as self.cursor:
-            return self.cursor
+                              cursor_factory=DictCursor) as self.connection:
+            return self.connection
