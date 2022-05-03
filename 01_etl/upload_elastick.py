@@ -3,7 +3,6 @@ import os
 import time
 from logging import config as logger_conf
 
-import psycopg2
 from dotenv import load_dotenv
 
 from elastic_operations import Elastic
@@ -12,6 +11,7 @@ from models import FilmWorkPersonGenre
 from postgre_operations import Postgres_operations
 from queries import get_all_query
 from state import JsonFileStorage, State
+from backoff import backoff
 
 logger_conf.dictConfig(log_conf)
 logger = logging.getLogger(__name__)
@@ -36,12 +36,12 @@ class ETL:
         self.ps = Postgres_operations(pg_dsl)
         self.es = Elastic()
         self.state = State(JsonFileStorage(state_file_path))
-        self.pg_conn = self.ps.postgres_connection()
         self.es_client = self.es.elastick_connection(elastic_connection_url)
         self.current_state = '1990-01-01'
         self.page_size = query_page_size
         self.query_models = FilmWorkPersonGenre
 
+    @backoff()
     def run(self):
         """Запуск бесконечного ETL процесса."""
         while True:
@@ -57,7 +57,10 @@ class ETL:
     def extract_from_postgres(self):
         """Метод получения данных из Postgres."""
 
-        data_cursor = self.ps.get_data_from_postgres(self.pg_conn, get_all_query(self.current_state))
+        data_cursor = self.ps.get_data_from_postgres(
+            self.ps.postgres_connection(),
+            get_all_query(self.current_state)
+        )
         while True:
             data = data_cursor.fetchmany(self.page_size)
             if not data:
