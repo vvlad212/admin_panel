@@ -33,12 +33,8 @@ class Elastic:
             Returns:
                 Elasticsearch:
         """
-        client = Elasticsearch(es_url)
-        if client.ping():
-            return client
-        else:
-            logger.error("Error ES connect")
-            raise ValueError("Error ES connect", es_url, client)
+
+        return Elasticsearch(es_url)
 
     def create_body(self, model_row: dict):
         """Создание bulk строки для одного документа.

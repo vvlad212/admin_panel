@@ -7,13 +7,12 @@ from psycopg2.extras import DictCursor
 from backoff import backoff
 
 logger = logging.getLogger(__name__)
-load_dotenv()
 
 
 class Postgres_operations:
     """Класс, содержащий методы для работы с Postgres."""
 
-    def __init__(self, dsl: [str, str]):
+    def __init__(self, dsl: dict[str, str]):
         self.dsl = dsl
 
     @backoff()
@@ -37,7 +36,7 @@ class Postgres_operations:
             pg_cursor.execute(query)
             return pg_cursor
         except psycopg2.Error:
-            logger.exception('Ошибка при получении данных из Postgres')
+            logger.exception('Error getting data from Postgres')
 
     @backoff()
     def postgres_connection(self):

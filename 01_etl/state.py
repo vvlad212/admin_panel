@@ -33,7 +33,6 @@ class JsonFileStorage(BaseStorage):
         """Сохранить состояние в постоянное хранилище"""
         with open(self.file_path, 'w') as file:
             file.write(json.dumps(state))
-            file.close()
 
 
 class State:
@@ -52,7 +51,9 @@ class State:
     def get_state(self, key: str) -> Any:
         """Получить состояние по определённому ключу"""
         state_dict = self.storage.retrieve_state()
-        if state_dict.keys().__contains__(key):
-            return state_dict[key]
-        else:
-            return None
+
+        return state_dict.get(key)
+        # if state_dict.keys().__contains__(key):
+        #     return state_dict[key]
+        # else:
+        #     return None

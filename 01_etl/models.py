@@ -6,6 +6,7 @@
 
 import uuid
 from pydantic import BaseModel
+from pydantic.class_validators import Optional
 
 
 class FilmWorkPersonGenre(BaseModel):

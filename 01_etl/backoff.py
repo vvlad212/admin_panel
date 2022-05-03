@@ -25,8 +25,7 @@ def backoff(start_sleep_time=0.1, factor=2, border_sleep_time=10):
             n = factor
             while True:
                 try:
-                    connection = func(*args, *kwargs)
-                    return connection
+                    return func(*args, *kwargs)
                 except Exception as ex:
                     logging.exception(ex)
                     logging.info(f"Connection attempt {n}")

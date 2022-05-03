@@ -2,6 +2,9 @@ import os
 import psycopg2
 import logging
 from logging import config as logger_conf
+
+from dotenv import load_dotenv
+
 from log_config import log_conf
 
 from postgre_operations import Postgres_operations
@@ -12,6 +15,7 @@ from state import State, JsonFileStorage
 
 logger_conf.dictConfig(log_conf)
 logger = logging.getLogger(__name__)
+load_dotenv()
 
 
 class ETL:
@@ -19,11 +23,13 @@ class ETL:
     Класс реализующий работу ETL процесса.
     """
 
-    def __init__(self,
-                 state_file_path: str,
-                 elastic_connection_url: str,
-                 pg_dsl: dict,
-                 query_page_size=100):
+    def __init__(
+            self,
+            state_file_path: str,
+            elastic_connection_url: str,
+            pg_dsl: dict,
+            query_page_size=100
+    ):
 
         self.ps_exec_cursor = None
         self.ps = Postgres_operations(pg_dsl)
@@ -57,15 +63,19 @@ class ETL:
                 break
 
             modified = str(data[-1]['modified'])
+
             bulk = []
-            [
-                [
-                    bulk.append(r)
-                    for r in
-                    self.es.create_body(self.query_models(**row).__dict__)
-                ]
-                for row in data
-            ]
+            for row in data:
+                model_row = self.query_models(**row).__dict__
+                bulk.append(
+                    {
+                        "index": {
+                            "_index": "movies",
+                            "_id": f"{model_row.pop('id')}"
+                        }
+                    }
+                )
+                bulk.append(model_row)
             self.load_to_elastic(bulk, modified)
 
     def load_to_elastic(self, bulk: list, modified: str):
