@@ -4,6 +4,9 @@ import json
 
 
 class BaseStorage:
+    def __init__(self):
+        self.file_path = ''
+
     @abc.abstractmethod
     def save_state(self, state: dict) -> None:
         """Сохранить состояние в постоянное хранилище"""

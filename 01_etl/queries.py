@@ -1,4 +1,4 @@
-def get_all(time_select):
+def get_all_query(time_select):
     get_all_data_from_postgre = f"""
     SELECT
     fw.modified,

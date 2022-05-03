@@ -11,40 +11,43 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 
-@backoff()
-def postgre_connection():
-    dsl = {
-        'dbname': os.environ.get('DB_NAME'),
-        'user': os.environ.get('DB_USER'),
-        'password': os.environ.get('DB_PASSWORD'),
-        'host': os.environ.get('DB_HOST'),
-        'port': os.environ.get('DB_PORT'),
-    }
+class Postgre_operations:
+    def __init__(self):
 
-    with psycopg2.connect(**dsl, cursor_factory=DictCursor) as cursor:
-        return cursor
+        self.dsl = {
+            'dbname': os.environ.get('DB_NAME'),
+            'user': os.environ.get('DB_USER'),
+            'password': os.environ.get('DB_PASSWORD'),
+            'host': os.environ.get('DB_HOST'),
+            'port': os.environ.get('DB_PORT'),
+        }
+
+    @backoff()
+    def postgre_cursor(self, connection: _connection):
+        """Получение курсора для Postgres.
+
+        Returns:
+            connection.cursor:
+        """
+        return connection.cursor()
+
+    @backoff()
+    def get_data_to_postgre(self, pg_conn: _connection, query: str):
+        """Вставка данных в БД postgre.
+
+        Вставка осуществляется пачками, размер определяется параметром page_size
+        """
+        try:
+            pg_cursor = self.postgre_cursor(pg_conn)
+            pg_cursor.execute(query)
+            return pg_cursor
+        except psycopg2.Error:
+            logger.exception('Ошибка при получении данных из postgre')
+            return 'false'
 
 
-@backoff()
-def postgre_cursor(connection: _connection):
-    """Получение курсора для Postgres.
-
-    Returns:
-        connection.cursor:
-    """
-    return connection.cursor()
-
-
-@backoff()
-def get_data_to_postgre(pg_conn: _connection, query: str):
-    """Вставка данных в БД postgre.
-
-    Вставка осуществляется пачками, размер определяется параметром page_size
-    """
-    try:
-        pg_cursor = postgre_cursor(pg_conn)
-        pg_cursor.execute(query)
-        return pg_cursor
-    except psycopg2.Error:
-        logger.exception('Ошибка при получении данных из postgre')
-        return 'false'
+    @backoff()
+    def postgre_connection(self):
+        with psycopg2.connect(**self.dsl,
+                              cursor_factory=DictCursor) as self.cursor:
+            return self.cursor
