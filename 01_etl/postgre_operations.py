@@ -1,9 +1,9 @@
-import psycopg2
-from dotenv import load_dotenv
-from psycopg2.extensions import connection as _connection
 import logging
 
+import psycopg2
+from psycopg2.extensions import connection as _connection
 from psycopg2.extras import DictCursor
+
 from backoff import backoff
 
 logger = logging.getLogger(__name__)

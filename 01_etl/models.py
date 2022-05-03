@@ -5,6 +5,7 @@
 """
 
 import uuid
+
 from pydantic import BaseModel
 from pydantic.class_validators import Optional
 
@@ -14,11 +15,11 @@ class FilmWorkPersonGenre(BaseModel):
 
     genre: list = []
     title: str
-    description: str = None
+    description: Optional[str] = None
     director: list[str]
-    actors_names: list = None
-    writers_names: list = None
-    actors: list[dict] = None
-    writers: list[dict] = None
+    actors_names: Optional[list] = None
+    writers_names: Optional[list] = None
+    actors: Optional[list[dict]] = None
+    writers: Optional[list[dict]] = None
     id: uuid.UUID
-    imdb_rating: float = None
+    imdb_rating: Optional[float] = None

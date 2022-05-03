@@ -1,8 +1,9 @@
 import logging
+from logging import config as logger_conf
 
 from elasticsearch import Elasticsearch
+
 from backoff import backoff
-from logging import config as logger_conf
 from log_config import log_conf
 
 logger_conf.dictConfig(log_conf)
@@ -22,9 +23,7 @@ class Elastic:
             Returns:
                 dict:
         """
-        if client.ping():
-            resp = client.bulk(body=bulk_list)
-            return resp
+        return client.bulk(body=bulk_list)
 
     @backoff()
     def elastick_connection(self, es_url: str):
@@ -35,18 +34,3 @@ class Elastic:
         """
 
         return Elasticsearch(es_url)
-
-    def create_body(self, model_row: dict):
-        """Создание bulk строки для одного документа.
-
-            Returns:
-                tuple(dict,dict):
-        """
-
-        row = {
-            "index": {
-                "_index": "movies",
-                "_id": f"{model_row['id']}"
-            }
-        }
-        return row, model_row

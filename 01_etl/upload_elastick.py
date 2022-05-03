@@ -1,17 +1,16 @@
-import os
-import psycopg2
 import logging
+import os
 from logging import config as logger_conf
 
+import psycopg2
 from dotenv import load_dotenv
 
+from elastic_operations import Elastic
 from log_config import log_conf
-
+from models import FilmWorkPersonGenre
 from postgre_operations import Postgres_operations
 from queries import get_all_query
-from models import FilmWorkPersonGenre
-from elastic_operations import Elastic
-from state import State, JsonFileStorage
+from state import JsonFileStorage, State
 
 logger_conf.dictConfig(log_conf)
 logger = logging.getLogger(__name__)
