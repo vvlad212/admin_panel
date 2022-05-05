@@ -13,32 +13,34 @@ logger = logging.getLogger(__name__)
 class Elastic:
     """Класс, содержащий методы для операций с Elastic."""
 
-    def __init__(self, es_url='localhost:9200'):
+    def __init__(self, es_url: str = 'localhost:9200'):
         self.es_url = es_url
-        self.client = self.elastick_connection()
+        self.client = self.elastic_connection()
 
-    @backoff()
     def upload_to_elastic(self, bulk_list: list):
         """Выполнение bulk запроса к Elastic.
 
-            Returns:
-                dict:
+        Returns:
+            dict:
         """
         try:
             return self.client.bulk(body=bulk_list)
 
         except ElasticsearchException:
-            self.elastick_connection()
+            self.client = self.elastic_connection()
 
     @backoff()
-    def elastick_connection(self):
+    def elastic_connection(self) -> Elasticsearch:
         """Подключение к Elastic.
 
-            Returns:
-                Elasticsearch:
+        Returns:
+            Elasticsearch:
         """
-        self.client = Elasticsearch(self.es_url)
+        client = Elasticsearch(self.es_url)
+        if client.ping():
+            logger.info("ES connection OK")
+        else:
+            raise ElasticsearchException
+        return client
 
-        return self.client
-        #if es_conn.ping():
 

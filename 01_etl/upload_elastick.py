@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from elastic_operations import Elastic
 from log_config import log_conf
 from models import FilmWorkPersonGenre
-from postgre_operations import Postgres_operations
+from postgre_operations import PostgresOperations
 from queries import get_all_query
 from state import JsonFileStorage, State
 from backoff import backoff
@@ -19,19 +19,17 @@ load_dotenv()
 
 
 class ETL:
-    """
-    Класс реализующий работу ETL пайп лайна.
-    """
+    """Класс реализующий работу ETL пайп лайна."""
 
     def __init__(
             self,
             state_file_path: str,
             elastic_connection_url: str,
             pg_dsl: dict,
-            query_page_size=100,
-            update_freq=10
+            query_page_size: int = 100,
+            update_freq: int = 10
     ):
-        self.ps = Postgres_operations(pg_dsl)
+        self.ps = PostgresOperations(pg_dsl)
         self.es = Elastic(es_url=elastic_connection_url)
         self.state = State(JsonFileStorage(state_file_path))
         self.current_state = '1990-01-01'
@@ -54,7 +52,6 @@ class ETL:
 
     def extract_from_postgres(self):
         """Метод получения данных из Postgres."""
-
         data_cursor = self.ps.get_data_cursor(
             get_all_query(self.current_state)
         )
@@ -66,8 +63,11 @@ class ETL:
             yield data
 
     def transform_data(self, data):
-        """Подготовка данных для вставки в Elastic."""
+        """Подготовка данных для вставки в Elastic.
 
+        Args:
+            data:
+        """
         modified = str(max([data[-1]['modified'], data[-1]['p_modified'],
                             data[-1]['g_modified']]))
         bulk = []
@@ -84,9 +84,13 @@ class ETL:
             bulk.append(model_row.__dict__)
         return bulk, modified
 
-    def load_to_elastic(self, bulk: list, modified: str):
-        """Загрузка подготовленных данных в Elastic."""
+    def load_to_elastic(self, bulk: list, modified: str) -> None:
+        """Загрузка подготовленных данных в Elastic."
 
+        Args:
+            bulk:
+            modified:
+        """
         es_resp = self.es.upload_to_elastic(bulk)
         if not es_resp['errors']:
             self.state.set_state('modified', modified)
@@ -119,3 +123,6 @@ if __name__ == '__main__':
 
     except Exception as ex:
         logger.exception(ex)
+
+    except KeyboardInterrupt:
+        pass

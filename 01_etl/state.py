@@ -6,12 +6,14 @@ from typing import Any, Optional
 
 
 class BaseStorage(ABC):
-    def __init__(self):
-        self.file_path = ''
 
     @abc.abstractmethod
     def save_state(self, state: dict) -> None:
-        """Сохранить состояние в постоянное хранилище"""
+        """Сохранить состояние в постоянное хранилище
+
+        Args:
+            state:
+        """
 
     @abc.abstractmethod
     def retrieve_state(self) -> dict:
@@ -19,6 +21,7 @@ class BaseStorage(ABC):
 
 
 class JsonFileStorage(BaseStorage):
+
     def __init__(self, file_path: Optional[str] = None):
         self.file_path = file_path
 

@@ -15,6 +15,7 @@ class FilmWorkPersonGenre(BaseModel):
 
     genre: list = []
     title: str
+    #  TODO: all none:
     description: Optional[str] = None
     director: list[str]
     actors_names: Optional[list] = None

@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Optional, Dict
 
 import psycopg2
 from psycopg2.extensions import connection as _connection
@@ -10,12 +10,12 @@ from backoff import backoff
 logger = logging.getLogger(__name__)
 
 
-class Postgres_operations:
+class PostgresOperations:
     """Класс, содержащий методы для работы с Postgres."""
 
     conn: Optional[_connection] = None
 
-    def __init__(self, dsl: dict[str, str]):
+    def __init__(self, dsl: Dict[str, str]):
         self.dsl = dsl
 
     @backoff()

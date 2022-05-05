@@ -1,5 +1,5 @@
 def get_all_query(time_select):
-    get_all_data_from_postgre = f"""
+    get_all_data_from_postgres = f"""
     SELECT
     fw.modified,
     p.modified as p_modified,
@@ -26,5 +26,5 @@ def get_all_query(time_select):
     GROUP BY fw.id, p.modified, fw.created, fw.modified, fw.type, g.modified, fw.rating, fw.title, fw.description
 
     ORDER BY fw.modified;
-"""
-    return get_all_data_from_postgre
+    """
+    return get_all_data_from_postgres
