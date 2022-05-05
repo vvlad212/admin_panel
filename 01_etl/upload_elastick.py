@@ -9,7 +9,7 @@ from elastic_operations import Elastic
 from log_config import log_conf
 from models import FilmWorkPersonGenre
 from postgre_operations import PostgresOperations
-from queries import get_all_query
+from queries import create_query
 from state import JsonFileStorage, State
 from backoff import backoff
 
@@ -45,15 +45,15 @@ class ETL:
             if get_state is not None:
                 self.current_state = get_state
 
-            for page in iter(self.extract_from_postgres()):
+            for page in iter(self.extract_from_pg()):
                 bulk, modified = self.transform_data(page)
                 self.load_to_elastic(bulk, modified)
             time.sleep(self.update_freq)
 
-    def extract_from_postgres(self):
+    def extract_from_pg(self):
         """Метод получения данных из Postgres."""
         data_cursor = self.ps.get_data_cursor(
-            get_all_query(self.current_state)
+            create_query(self.current_state)
         )
         while True:
             data = data_cursor.fetchmany(self.page_size)
@@ -81,7 +81,7 @@ class ETL:
                     }
                 }
             )
-            bulk.append(model_row.__dict__)
+            bulk.append(dict(model_row))
         return bulk, modified
 
     def load_to_elastic(self, bulk: list, modified: str) -> None:

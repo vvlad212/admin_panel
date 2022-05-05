@@ -1,5 +1,5 @@
-def get_all_query(time_select):
-    get_all_data_from_postgres = f"""
+def create_query(time_select):
+    fw_p_g_query = f"""
     SELECT
     fw.modified,
     p.modified as p_modified,
@@ -27,4 +27,4 @@ def get_all_query(time_select):
 
     ORDER BY fw.modified;
     """
-    return get_all_data_from_postgres
+    return fw_p_g_query

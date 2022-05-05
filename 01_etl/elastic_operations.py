@@ -1,12 +1,9 @@
 import logging
-from logging import config as logger_conf
 
 from elasticsearch import Elasticsearch, ElasticsearchException
 
 from backoff import backoff
-from log_config import log_conf
 
-logger_conf.dictConfig(log_conf)
 logger = logging.getLogger(__name__)
 
 
@@ -17,16 +14,20 @@ class Elastic:
         self.es_url = es_url
         self.client = self.elastic_connection()
 
-    def upload_to_elastic(self, bulk_list: list):
+    def upload_to_elastic(self, bulk_list: list) -> dict:
         """Выполнение bulk запроса к Elastic.
 
+        Args:
+            bulk_list:
+
         Returns:
-            dict:
+            dict
         """
         try:
             return self.client.bulk(body=bulk_list)
 
         except ElasticsearchException:
+            logger.error('Lost connection to Elastic')
             self.client = self.elastic_connection()
 
     @backoff()
@@ -42,5 +43,3 @@ class Elastic:
         else:
             raise ElasticsearchException
         return client
-
-

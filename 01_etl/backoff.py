@@ -2,6 +2,8 @@ import logging
 import time
 from functools import wraps
 
+logger = logging.getLogger(__name__)
+
 
 def backoff(start_sleep_time=0.1, factor=2, border_sleep_time=10):
     """
@@ -27,8 +29,8 @@ def backoff(start_sleep_time=0.1, factor=2, border_sleep_time=10):
                 try:
                     return func(*args, *kwargs)
                 except Exception as ex:
-                    logging.exception(ex)
-                    logging.info(f"Attempt {n}")
+                    logger.exception(ex)
+                    logger.info(f"Attempt {n}")
                     if t < border_sleep_time:
                         t = start_sleep_time * (2 ** n)
                     if t >= border_sleep_time:

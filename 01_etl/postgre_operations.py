@@ -19,13 +19,13 @@ class PostgresOperations:
         self.dsl = dsl
 
     @backoff()
-    def get_ps_cursor(self):
+    def get_pg_cursor(self):
         """Получение курсора для Postgres.
 
         Returns:
             connection.cursor:
         """
-        self.conn = self.postgres_connection()
+        self.conn = self.connection_to_pg()
         return self.conn.cursor()
 
     @backoff()
@@ -36,14 +36,14 @@ class PostgresOperations:
             connection.cursor:
         """
         try:
-            pg_cursor = self.get_ps_cursor()
-            pg_cursor.execute(query)
-            return pg_cursor
+            pg_data_cursor = self.get_pg_cursor()
+            pg_data_cursor.execute(query)
+            return pg_data_cursor
         except psycopg2.Error:
-            logger.exception('Error getting data from Postgres')
+            logger.exception('PG query execution error')
 
     @backoff()
-    def postgres_connection(self):
+    def connection_to_pg(self):
         """Подключение к БД Postgres.
 
         Returns:
