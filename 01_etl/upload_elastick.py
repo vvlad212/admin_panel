@@ -68,8 +68,7 @@ class ETL:
         Args:
             data:
         """
-        modified = str(max([data[-1]['modified'], data[-1]['p_modified'],
-                            data[-1]['g_modified']]))
+        modified = str(data[-1]['modified'])
         bulk = []
         for row in data:
             model_row = self.query_models(**row)

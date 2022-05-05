@@ -16,7 +16,7 @@ class FilmWorkPersonGenre(BaseModel):
     genre: Optional[list] = None
     title: Optional[str] = None
     description: Optional[str] = None
-    director: Optional[list] = None
+    director: Optional[list[str]] = None
     actors_names: Optional[list] = None
     writers_names: Optional[list] = None
     actors: Optional[list[dict]] = None
