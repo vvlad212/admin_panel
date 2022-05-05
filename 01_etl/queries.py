@@ -2,6 +2,8 @@ def get_all_query(time_select):
     get_all_data_from_postgre = f"""
     SELECT
     fw.modified,
+    p.modified as p_modified,
+    g.modified as g_modified,
     fw.id,
     fw.rating as imdb_rating,
     array_agg(DISTINCT g.name) filter (WHERE g.name is not null)                                as genre,
@@ -21,7 +23,8 @@ def get_all_query(time_select):
              LEFT JOIN content.genre_film_work gfw                              ON gfw.film_work_id = fw.id
              LEFT JOIN content.genre g                                          ON g.id = gfw.genre_id
     WHERE fw.modified > '{time_select}' or g.modified > '{time_select}' or p.modified > '{time_select}'
-    GROUP BY fw.id
+    GROUP BY fw.id, p.modified, fw.created, fw.modified, fw.type, g.modified, fw.rating, fw.title, fw.description
+
     ORDER BY fw.modified;
 """
     return get_all_data_from_postgre

@@ -41,7 +41,7 @@ class JsonFileStorage(BaseStorage):
 class State:
     """
     Класс для хранения состояния при работе с данными, чтобы постоянно
-    не перечитывать данные с начала.
+    не перечитывать данные с начала.178
     """
 
     def __init__(self, storage: BaseStorage):

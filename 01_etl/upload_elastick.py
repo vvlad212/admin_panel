@@ -31,13 +31,11 @@ class ETL:
             query_page_size=100,
             update_freq=10
     ):
-        self.update_freq = update_freq
-        self.ps_exec_cursor = None
         self.ps = Postgres_operations(pg_dsl)
-        self.es = Elastic()
+        self.es = Elastic(es_url=elastic_connection_url)
         self.state = State(JsonFileStorage(state_file_path))
-        self.es_client = self.es.elastick_connection(elastic_connection_url)
         self.current_state = '1990-01-01'
+        self.update_freq = update_freq
         self.page_size = query_page_size
         self.query_models = FilmWorkPersonGenre
 
@@ -57,8 +55,7 @@ class ETL:
     def extract_from_postgres(self):
         """Метод получения данных из Postgres."""
 
-        data_cursor = self.ps.get_data_from_postgres(
-            self.ps.postgres_connection(),
+        data_cursor = self.ps.get_data_cursor(
             get_all_query(self.current_state)
         )
         while True:
@@ -71,9 +68,9 @@ class ETL:
     def transform_data(self, data):
         """Подготовка данных для вставки в Elastic."""
 
-        modified = str(data[-1]['modified'])
+        modified = str(max([data[-1]['modified'], data[-1]['p_modified'],
+                            data[-1]['g_modified']]))
         bulk = []
-
         for row in data:
             model_row = self.query_models(**row)
             bulk.append(
@@ -90,7 +87,7 @@ class ETL:
     def load_to_elastic(self, bulk: list, modified: str):
         """Загрузка подготовленных данных в Elastic."""
 
-        es_resp = self.es.upload_to_elastic(bulk, self.es_client)
+        es_resp = self.es.upload_to_elastic(bulk)
         if not es_resp['errors']:
             self.state.set_state('modified', modified)
         else:
