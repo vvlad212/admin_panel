@@ -20,9 +20,9 @@ def create_query(time_select):
              LEFT JOIN content.person p                                         ON p.id = pfw.person_id
              LEFT JOIN content.genre_film_work gfw                              ON gfw.film_work_id = fw.id
              LEFT JOIN content.genre g                                          ON g.id = gfw.genre_id
-    WHERE fw.modified > '{time_select}' or g.modified > '{time_select}' or p.modified > '{time_select}' 
-
+    WHERE fw.modified > '{time_select}' or g.modified > '{time_select}' or p.modified > '{time_select}'
     GROUP BY fw.id
+
     ORDER BY fw.modified;
     """
     return fw_p_g_query

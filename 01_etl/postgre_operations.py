@@ -41,6 +41,7 @@ class PostgresOperations:
             return pg_data_cursor
         except psycopg2.Error:
             logger.exception('PG query execution error')
+            self.conn = self.connection_to_pg()
 
     @backoff()
     def connection_to_pg(self):
