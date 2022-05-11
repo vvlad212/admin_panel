@@ -122,7 +122,7 @@ if __name__ == '__main__':
 
     except Exception as ex:
         logger.exception(ex)
-        pass
+
 
     except KeyboardInterrupt:
         pass
