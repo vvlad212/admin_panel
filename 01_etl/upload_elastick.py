@@ -98,7 +98,7 @@ class ETL:
 
 
 if __name__ == '__main__':
-    page_size = 100
+    page_size = 50
     state_file = os.environ.get('STATE_FILE')
     elastic_url = os.getenv('ES_URL')
     update_frequency = 5
